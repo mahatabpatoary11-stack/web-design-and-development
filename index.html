@@ -1,18 +1,694 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>my first website</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-<link rel="manifest" href="./site.webmanifest">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assalamu Alaikum - Peaceful Digital Experience</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            amiri: ['Amiri', 'serif'],
+            cinzel: ['Cinzel', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            emerald: {
+              850: '#064e3b',
+              950: '#022c22',
+            },
+            gold: {
+              300: '#fef08a',
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+            }
+          },
+          animation: {
+            'glow-pulse': 'glow 4s ease-in-out infinite alternate',
+            'float-slow': 'floating 6s ease-in-out infinite',
+            'rotate-slow': 'spin 30s linear infinite',
+          },
+          keyframes: {
+            glow: {
+              '0%': { textShadow: '0 0 15px rgba(234, 179, 8, 0.2), 0 0 30px rgba(16, 185, 129, 0.2)' },
+              '100%': { textShadow: '0 0 35px rgba(250, 204, 21, 0.6), 0 0 60px rgba(52, 211, 153, 0.4)' },
+            },
+            floating: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Smooth Scroll & Glassmorphism */
+    html {
+      scroll-behavior: smooth;
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .light .glass-panel {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .emerald-glow {
+      box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.35);
+    }
+
+    /* 3D Carousel perspective container */
+    .slider-stage {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+    }
+    .slide-card {
+      transition: all 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+    }
+    
+    /* Islamic Geometric Pattern Background Overlay */
+    .islamic-pattern {
+      background-image: radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.06) 1px, transparent 1px),
+                        radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+  </style>
 </head>
-<body>
-  <h1>Assalamu alaikum</h1>
-  <img src="./img/slider2.jpg" alt="slider2" />
-  <img src="./img/slider1.jpg" alt="slider1" />
-  <p></p>
+<body class="bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-white relative min-h-screen overflow-x-hidden transition-colors duration-500">
+
+  <canvas id="ambient-canvas" class="fixed inset-0 pointer-events-none z-0 w-full h-full"></canvas>
+  <div class="fixed inset-0 islamic-pattern pointer-events-none z-0 opacity-60"></div>
+  
+  <!-- Subtle Ambient Glow Orbs -->
+  <div class="fixed top-12 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+  <div class="fixed bottom-20 right-1/4 w-[30rem] h-[30rem] bg-gold-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-delay: 2s;"></div>
+
+  <header class="relative z-20 w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+    <div class="flex items-center space-x-3 group cursor-pointer" onclick="triggerChime()">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-[1px] shadow-lg shadow-emerald-500/20">
+        <div class="w-full h-full bg-slate-900 rounded-[11px] flex items-center justify-center transition-transform group-hover:scale-105">
+          <!-- Crescent & Star SVG -->
+          <svg class="w-5 h-5 text-gold-400" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 1 12 2zm6.2 3.8a1 1 0 0 0-1.4 0l-.8.8-.8-.8a1 1 0 0 0-1.4 1.4l.8.8-.8.8a1 1 0 1 0 1.4 1.4l.8-.8.8.8a1 1 0 0 0 1.4-1.4l-.8-.8.8-.8a1 1 0 0 0 0-1.4z"/>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <span class="text-sm font-semibold tracking-widest uppercase text-emerald-400 block font-cinzel">Peace & Light</span>
+        <span class="text-xs text-slate-400">Digital Sanctuary</span>
+      </div>
+    </div>
+
+    <!-- Controls: Audio, Mood Lighting, Share -->
+    <div class="flex items-center space-x-3">
+      <!-- Audio Toggle Button -->
+      <button id="sound-btn" class="glass-panel hover:bg-slate-800/80 text-slate-300 hover:text-gold-300 px-3.5 py-2 rounded-xl text-xs flex items-center space-x-2 transition-all shadow-md active:scale-95" title="Toggle peaceful chime sounds">
+        <svg id="sound-icon-on" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+        </svg>
+        <svg id="sound-icon-off" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+        </svg>
+        <span id="sound-label">Audio: Off</span>
+      </button>
+
+      <!-- Theme Switcher Button -->
+      <button id="theme-btn" class="glass-panel hover:bg-slate-800/80 text-slate-300 hover:text-emerald-300 p-2.5 rounded-xl transition-all shadow-md active:scale-95" title="Switch Day/Night Ambience">
+        <svg id="theme-sun" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-6 pb-20 flex flex-col items-center text-center">
+    
+    <!-- Top Floating Blessings Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs text-gold-300 mb-6 animate-float-slow shadow-sm border border-gold-400/20">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <span>May Peace, Mercy & Blessings be upon you</span>
+    </div>
+
+    <!-- Arabic Calligraphy Inscription -->
+    <div class="text-4xl md:text-6xl font-amiri text-gold-300 tracking-wide font-normal mb-2 leading-relaxed animate-glow-pulse select-none">
+      السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّهِ وَبَرَكَاتُهُ
+    </div>
+
+    <!-- English Main Heading -->
+    <h1 class="text-4xl md:text-6xl lg:text-7xl font-cinzel font-extrabold tracking-tight mt-2 mb-4">
+      <span class="gold-gradient-text drop-shadow-sm">Assalamu</span>
+      <span class="text-white drop-shadow-sm">Alaikum</span>
+    </h1>
+
+    <p class="max-w-xl text-base md:text-lg text-slate-300 font-light leading-relaxed mb-10">
+      Welcome to your serene digital home. Experience tranquility through sacred geometry, harmonious tones, and curated photographic views.
+    </p>
+
+    <!-- Interactive Greeting Response Action Buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-4 mb-14">
+      <button onclick="respondGreeting()" class="group relative px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white font-medium text-sm shadow-lg shadow-emerald-700/30 hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 overflow-hidden">
+        <span class="relative z-10 flex items-center space-x-2">
+          <span>Reply "Wa Alaikum Assalam"</span>
+          <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </span>
+        <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      </button>
+
+      <button onclick="copyDua()" class="px-5 py-3 rounded-2xl glass-panel hover:bg-slate-800/80 text-slate-200 text-sm font-medium transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-2 border border-slate-700">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+        </svg>
+        <span id="copy-btn-text">Share Peace Blessing</span>
+      </button>
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-panel border border-emerald-500/40 bg-slate-900/90 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-3">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></div>
+      <span id="toast-message" class="text-sm font-medium">Blessing copied to clipboard!</span>
+    </div>
+
+    <div class="w-full relative mt-4">
+      <div class="flex items-center justify-between mb-4 px-2">
+        <div class="text-left">
+          <h2 class="text-lg font-cinzel font-semibold text-slate-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-gold-400"></span>
+            Curated Visual Gallery
+          </h2>
+          <p class="text-xs text-slate-400">Slider views with smooth perspective shifts</p>
+        </div>
+        
+        <!-- Navigation Controls -->
+        <div class="flex items-center space-x-2">
+          <button id="prev-slide" class="w-10 h-10 rounded-full glass-panel hover:bg-emerald-600/30 flex items-center justify-center text-slate-300 hover:text-white transition-all active:scale-90" aria-label="Previous Slide">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button id="next-slide" class="w-10 h-10 rounded-full glass-panel hover:bg-emerald-600/30 flex items-center justify-center text-slate-300 hover:text-white transition-all active:scale-90" aria-label="Next Slide">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Stage -->
+      <div class="slider-stage relative h-[360px] md:h-[460px] w-full flex items-center justify-center overflow-hidden py-4">
+        
+        <!-- Slide 1: Mosque Architecture / Slider 1 replacement -->
+        <div class="slide-card absolute w-[86%] md:w-[65%] h-[320px] md:h-[400px] rounded-3xl overflow-hidden shadow-2xl cursor-pointer select-none" data-index="0">
+          <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1400&q=80" 
+               alt="Grand Mosque Dome at Sunset" 
+               class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+               onerror="this.src='https://placehold.co/1200x800/064e3b/ffffff?text=Sacred+Mosque+Architecture'"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent p-6 md:p-8 flex flex-col justify-end text-left">
+            <span class="text-xs uppercase tracking-widest text-emerald-400 font-semibold mb-1 font-cinzel">Architecture of Peace</span>
+            <h3 class="text-xl md:text-2xl font-bold text-white">Grand Mosques & Celestial Domes</h3>
+            <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-md line-clamp-2">Exquisite geometry reflecting endless harmony, light, and timeless spiritual devotion.</p>
+          </div>
+        </div>
+
+        <!-- Slide 2: Mountain Serenity / Slider 2 replacement -->
+        <div class="slide-card absolute w-[86%] md:w-[65%] h-[320px] md:h-[400px] rounded-3xl overflow-hidden shadow-2xl cursor-pointer select-none" data-index="1">
+          <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80" 
+               alt="Peaceful Horizon and Waters" 
+               class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+               onerror="this.src='https://placehold.co/1200x800/042f2e/ffffff?text=Peaceful+Natural+Horizons'"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent p-6 md:p-8 flex flex-col justify-end text-left">
+            <span class="text-xs uppercase tracking-widest text-gold-400 font-semibold mb-1 font-cinzel">Contemplation</span>
+            <h3 class="text-xl md:text-2xl font-bold text-white">The Serenity of Creation</h3>
+            <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-md line-clamp-2">"And He has made for you the night and day and the sun and moon..."</p>
+          </div>
+        </div>
+
+        <!-- Slide 3: Desert Dunes & Starry Sky -->
+        <div class="slide-card absolute w-[86%] md:w-[65%] h-[320px] md:h-[400px] rounded-3xl overflow-hidden shadow-2xl cursor-pointer select-none" data-index="2">
+          <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1400&q=80" 
+               alt="Lantern and warm light" 
+               class="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+               onerror="this.src='https://placehold.co/1200x800/1e1b4b/ffffff?text=Luminous+Lanterns'"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent p-6 md:p-8 flex flex-col justify-end text-left">
+            <span class="text-xs uppercase tracking-widest text-teal-400 font-semibold mb-1 font-cinzel">Illumination</span>
+            <h3 class="text-xl md:text-2xl font-bold text-white">Luminous Lanterns of Guidance</h3>
+            <p class="text-xs md:text-sm text-slate-300 mt-1 max-w-md line-clamp-2">Radiance piercing through the dark, bringing comfort and warmth to seekers of light.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Slide Indicator Dots -->
+      <div class="flex items-center justify-center space-x-2 mt-4" id="carousel-dots">
+        <button class="dot-btn w-7 h-2 rounded-full bg-emerald-500 transition-all duration-300" onclick="goToSlide(0)"></button>
+        <button class="dot-btn w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-500 transition-all duration-300" onclick="goToSlide(1)"></button>
+        <button class="dot-btn w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-500 transition-all duration-300" onclick="goToSlide(2)"></button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mt-16 text-left">
+      <!-- Card 1 -->
+      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-300">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </div>
+        <h4 class="font-cinzel font-bold text-white text-base mb-1">Spread The Greeting</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          The greeting of "Salam" is an invitation to mutual safety, kindness, and reciprocal prayer for one another.
+        </p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-gold-500/50 transition-all duration-300">
+        <div class="w-10 h-10 rounded-xl bg-gold-500/10 text-gold-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+        </div>
+        <h4 class="font-cinzel font-bold text-white text-base mb-1">Heartfelt Serenity</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Finding quiet moments of gratitude softens our perception and connects us to the universal source of beauty.
+        </p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-teal-500/50 transition-all duration-300">
+        <div class="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <h4 class="font-cinzel font-bold text-white text-base mb-1">Eternal Remembrance</h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          "Unquestionably, by the remembrance of Allah hearts are assured." Reflect on life's subtle wonders.
+        </p>
+      </div>
+    </div>
+
+    <!-- Interactive Counter of Shared Peace -->
+    <div class="mt-14 glass-panel px-8 py-5 rounded-3xl inline-flex items-center space-x-6 border border-emerald-500/20">
+      <div>
+        <div id="counter-value" class="text-3xl font-bold font-cinzel text-emerald-400">1,248</div>
+        <div class="text-[11px] text-slate-400 uppercase tracking-wider">Salams Shared Today</div>
+      </div>
+      <div class="h-8 w-px bg-slate-700"></div>
+      <button onclick="sendVirtualSalam()" class="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center space-x-1.5 transition-colors">
+        <span>Send Salam Now</span>
+        <span class="text-base">✨</span>
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="relative z-10 border-t border-slate-800/80 py-8 px-6 text-center text-xs text-slate-500">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <p>Created with devotion & elegance • Spread kindness wherever you go</p>
+      <p class="text-slate-400 flex items-center gap-1">
+        <span>Made with peace</span>
+        <span class="text-red-400">❤</span>
+        <span>and harmony</span>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       1. STARFIELD & GOLDEN AMBIENT PARTICLES (Canvas)
+       ========================================================= */
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    class StarParticle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2 + 0.5;
+        this.baseAlpha = Math.random() * 0.7 + 0.1;
+        this.alpha = this.baseAlpha;
+        this.speedX = (Math.random() - 0.5) * 0.2;
+        this.speedY = -Math.random() * 0.4 - 0.1;
+        this.twinkleSpeed = Math.random() * 0.02 + 0.005;
+        this.color = Math.random() > 0.4 ? '234, 179, 8' : '52, 211, 153'; // Gold or Emerald
+      }
+
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.alpha = this.baseAlpha + Math.sin(Date.now() * this.twinkleSpeed) * 0.3;
+
+        // Reset if drifted beyond bounds
+        if (this.y < 0 || this.x < 0 || this.x > width) {
+          this.reset();
+          this.y = height + 10;
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color}, ${Math.max(0, this.alpha)})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `rgba(${this.color}, 0.8)`;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.floor((width * height) / 9000);
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new StarParticle());
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    });
+
+    initParticles();
+    animateParticles();
+
+    /* =========================================================
+       2. TONE.JS AMBIENT HARMONIC CHIMES (Safe audio context)
+       ========================================================= */
+    let audioEnabled = false;
+    let synth = null;
+
+    function initAudio() {
+      if (!synth && window.Tone) {
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.1, decay: 1.8, sustain: 0.2, release: 2.5 }
+        }).toDestination();
+        synth.volume.value = -12;
+      }
+    }
+
+    const soundBtn = document.getElementById('sound-btn');
+    const soundLabel = document.getElementById('sound-label');
+    const iconOn = document.getElementById('sound-icon-on');
+    const iconOff = document.getElementById('sound-icon-off');
+
+    soundBtn.addEventListener('click', async () => {
+      if (!audioEnabled) {
+        await Tone.start();
+        initAudio();
+        audioEnabled = true;
+        soundLabel.innerText = 'Audio: On';
+        iconOn.classList.remove('hidden');
+        iconOff.classList.add('hidden');
+        showToast('Peaceful ambient audio enabled ✨');
+        playHarmonicChord();
+      } else {
+        audioEnabled = false;
+        soundLabel.innerText = 'Audio: Off';
+        iconOn.classList.add('hidden');
+        iconOff.classList.remove('hidden');
+        showToast('Audio muted');
+      }
+    });
+
+    function playHarmonicChord() {
+      if (!audioEnabled || !synth) return;
+      const chords = [
+        ['D4', 'F#4', 'A4', 'C#5'],
+        ['G3', 'B3', 'D4', 'F#4'],
+        ['A3', 'C#4', 'E4', 'G4']
+      ];
+      const randomChord = chords[Math.floor(Math.random() * chords.length)];
+      synth.triggerAttackRelease(randomChord, '2n');
+    }
+
+    function triggerChime() {
+      if (audioEnabled && synth) {
+        synth.triggerAttackRelease(['E5', 'B5'], '8n');
+      }
+    }
+
+    /* =========================================================
+       3. 3D INTERACTIVE CAROUSEL CONTROLLER
+       ========================================================= */
+    const slides = Array.from(document.querySelectorAll('.slide-card'));
+    const dots = Array.from(document.querySelectorAll('.dot-btn'));
+    let currentIndex = 0;
+    let autoSlideInterval;
+
+    function updateCarousel() {
+      slides.forEach((slide, index) => {
+        let diff = index - currentIndex;
+        
+        // Handle wrap-around diff
+        if (diff > 1) diff -= slides.length;
+        if (diff < -1) diff += slides.length;
+
+        if (diff === 0) {
+          // Center Active Slide
+          slide.style.transform = 'translateX(0%) translateZ(80px) rotateY(0deg) scale(1)';
+          slide.style.opacity = '1';
+          slide.style.zIndex = '30';
+          slide.style.filter = 'none';
+        } else if (diff === 1 || (currentIndex === slides.length - 1 && index === 0)) {
+          // Right slide
+          slide.style.transform = 'translateX(55%) translateZ(-90px) rotateY(-22deg) scale(0.85)';
+          slide.style.opacity = '0.6';
+          slide.style.zIndex = '15';
+          slide.style.filter = 'brightness(0.6) blur(1px)';
+        } else if (diff === -1 || (currentIndex === 0 && index === slides.length - 1)) {
+          // Left slide
+          slide.style.transform = 'translateX(-55%) translateZ(-90px) rotateY(22deg) scale(0.85)';
+          slide.style.opacity = '0.6';
+          slide.style.zIndex = '15';
+          slide.style.filter = 'brightness(0.6) blur(1px)';
+        } else {
+          // Hidden back slide
+          slide.style.transform = 'translateX(0%) translateZ(-250px) scale(0.7)';
+          slide.style.opacity = '0';
+          slide.style.zIndex = '5';
+        }
+      });
+
+      // Update dot styles
+      dots.forEach((dot, idx) => {
+        if (idx === currentIndex) {
+          dot.className = 'dot-btn w-7 h-2 rounded-full bg-emerald-500 transition-all duration-300';
+        } else {
+          dot.className = 'dot-btn w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-500 transition-all duration-300';
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % slides.length;
+      updateCarousel();
+      playHarmonicChord();
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      updateCarousel();
+      playHarmonicChord();
+    }
+
+    function goToSlide(index) {
+      currentIndex = index;
+      updateCarousel();
+      playHarmonicChord();
+      resetAutoSlide();
+    }
+
+    document.getElementById('next-slide').addEventListener('click', () => {
+      nextSlide();
+      resetAutoSlide();
+    });
+
+    document.getElementById('prev-slide').addEventListener('click', () => {
+      prevSlide();
+      resetAutoSlide();
+    });
+
+    slides.forEach((slide) => {
+      slide.addEventListener('click', function () {
+        const idx = parseInt(this.getAttribute('data-index'));
+        if (idx !== currentIndex) {
+          goToSlide(idx);
+        }
+      });
+    });
+
+    // Touch Swipe Navigation for Mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const stage = document.querySelector('.slider-stage');
+
+    stage.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    stage.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const threshold = 40;
+      if (touchEndX < touchStartX - threshold) {
+        nextSlide();
+        resetAutoSlide();
+      } else if (touchEndX > touchStartX + threshold) {
+        prevSlide();
+        resetAutoSlide();
+      }
+    }
+
+    function resetAutoSlide() {
+      clearInterval(autoSlideInterval);
+      autoSlideInterval = setInterval(nextSlide, 7000);
+    }
+
+    // Initialize layout
+    updateCarousel();
+    resetAutoSlide();
+
+    /* =========================================================
+       4. INTERACTIONS, TOAST & SHARING UTILITIES
+       ========================================================= */
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    let toastTimeout;
+
+    function showToast(msg) {
+      toastMessage.innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+      }, 3500);
+    }
+
+    function copyDua() {
+      const textToCopy = "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّهِ وَبَرَكَاتُهُ — May peace, mercy, and blessings of God be upon you.";
+      
+      // Standard fallback mechanism for safe clipboard execution
+      const tempInput = document.createElement("textarea");
+      tempInput.value = textToCopy;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast("Peace greeting copied to clipboard! 📋");
+      } catch (err) {
+        showToast("Unable to copy directly. Peace be upon you!");
+      }
+      document.body.removeChild(tempInput);
+      triggerChime();
+    }
+
+    function respondGreeting() {
+      showToast("وَعَلَيْكُمُ ٱلسَّلَامُ وَرَحْمَةُ ٱللَّهِ وَبَرَكَاتُهُ (And upon you be peace!)");
+      if (audioEnabled && synth) {
+        synth.triggerAttackRelease(['G4', 'C5', 'E5'], '2n');
+      }
+    }
+
+    let salamCount = 1248;
+    function sendVirtualSalam() {
+      salamCount++;
+      const counterEl = document.getElementById('counter-value');
+      counterEl.innerText = salamCount.toLocaleString();
+      counterEl.classList.add('scale-110', 'text-gold-300');
+      setTimeout(() => {
+        counterEl.classList.remove('scale-110', 'text-gold-300');
+      }, 300);
+
+      showToast("Salam sent! Blessings multiplied 🕊️");
+      triggerChime();
+    }
+
+    /* =========================================================
+       5. DAY / NIGHT LIGHTING TOGGLE
+       ========================================================= */
+    const themeBtn = document.getElementById('theme-btn');
+    let isDay = false;
+
+    themeBtn.addEventListener('click', () => {
+      isDay = !isDay;
+      const htmlEl = document.documentElement;
+      
+      if (isDay) {
+        htmlEl.classList.remove('dark');
+        htmlEl.classList.add('light');
+        document.body.classList.remove('bg-slate-950');
+        document.body.classList.add('bg-slate-100', 'text-slate-850');
+        showToast("Switched to Sunlit Dawn mode ☀️");
+      } else {
+        htmlEl.classList.add('dark');
+        htmlEl.classList.remove('light');
+        document.body.classList.add('bg-slate-950');
+        document.body.classList.remove('bg-slate-100', 'text-slate-850');
+        showToast("Switched to Celestial Night mode 🌙");
+      }
+      triggerChime();
+    });
+  </script>
 </body>
 </html>
+```
